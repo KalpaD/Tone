@@ -1,6 +1,7 @@
 package com.kds.tone.service;
 
 import com.kds.tone.model.RateLimitResults;
+import com.kds.tone.ratelimit.FixedTimeWindowRateLimiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -26,29 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RateLimiterServiceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RateLimiterServiceTest.class);
-    private RateLimiterService rateLimiterService;
+    private FixedTimeWindowRateLimiter rateLimiter;
 
     @BeforeEach
     public void setUp() {
-        rateLimiterService = new RateLimiterService(3, 4);
+        rateLimiter = new FixedTimeWindowRateLimiter(3, 4);
     }
 
     @Test
     public void isAllowed_should_return_true_when_new_user_hits_1st_time() {
         String userId = "1234";
-        RateLimitResults rateLimitResults = rateLimiterService.isAllowed(userId);
+        RateLimitResults rateLimitResults = rateLimiter.isAllowed(userId);
         assertTrue(rateLimitResults.isAllowed());
     }
 
     @Test
     public void isAllowed_should_return_true_when_same_users_hits_2nd_time_after_time_window() throws InterruptedException {
         String userId = "1234";
-        RateLimitResults rateLimitResultsFirstTime = rateLimiterService.isAllowed(userId);
+        RateLimitResults rateLimitResultsFirstTime = rateLimiter.isAllowed(userId);
         assertTrue(rateLimitResultsFirstTime.isAllowed());
 
         // wait for 5 seconds, and hit again
         Thread.sleep(5000);
-        RateLimitResults rateLimitResultsAfter3Secs = rateLimiterService.isAllowed(userId);
+        RateLimitResults rateLimitResultsAfter3Secs = rateLimiter.isAllowed(userId);
         assertTrue(rateLimitResultsAfter3Secs.isAllowed());
     }
 
@@ -73,11 +74,11 @@ public class RateLimiterServiceTest {
     @Test
     public void isAllowed_should_return_true_when_two_user_hits_1st_time() {
         String userIdFirstUser = "1234";
-        RateLimitResults rateLimitResultsFirstUser = rateLimiterService.isAllowed(userIdFirstUser);
+        RateLimitResults rateLimitResultsFirstUser = rateLimiter.isAllowed(userIdFirstUser);
         assertTrue(rateLimitResultsFirstUser.isAllowed());
 
         String userIdSecondUser = "5678";
-        RateLimitResults rateLimitResultsSecondUser = rateLimiterService.isAllowed(userIdSecondUser);
+        RateLimitResults rateLimitResultsSecondUser = rateLimiter.isAllowed(userIdSecondUser);
         assertTrue(rateLimitResultsSecondUser.isAllowed());
     }
 
@@ -95,7 +96,7 @@ public class RateLimiterServiceTest {
             Thread u1Thread1 = new Thread(() -> {
                 try {
                     barrier.await();
-                    RateLimitResults rateLimitResults = rateLimiterService.isAllowed(userIdFirstUser);
+                    RateLimitResults rateLimitResults = rateLimiter.isAllowed(userIdFirstUser);
                     resultsQueue.add(rateLimitResults);
                     latch.countDown();
                 } catch (InterruptedException e) {
@@ -134,7 +135,7 @@ public class RateLimiterServiceTest {
         Thread.sleep(2000);
 
         // invoke again
-        RateLimitResults results = rateLimiterService.isAllowed(userId);
+        RateLimitResults results = rateLimiter.isAllowed(userId);
         assertFalse(results.isAllowed());
         assertThat(results.getNumOfSecondsForRetry(), is(2L));
     }
@@ -142,7 +143,7 @@ public class RateLimiterServiceTest {
     private List<RateLimitResults> invokeIsAllowed(String userId, int numberOfTimes) {
         List<RateLimitResults> resultsList = new ArrayList<>();
         for (int i = 0; i < numberOfTimes; i++) {
-            resultsList.add(rateLimiterService.isAllowed(userId));
+            resultsList.add(rateLimiter.isAllowed(userId));
         }
         return resultsList;
     }

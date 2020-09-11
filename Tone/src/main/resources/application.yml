@@ -1,1 +1,2 @@
-
+#fixed.window.rate.limit.max.requests: 10
+#fixed.window.rate.limit.time.window.in.seconds: 30

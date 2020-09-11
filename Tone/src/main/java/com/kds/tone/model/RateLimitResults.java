@@ -17,4 +17,8 @@ public class RateLimitResults {
     public long getNumOfSecondsForRetry() {
         return numOfSecondsForRetry;
     }
+
+    public String getMessage() {
+        return String.format("Rate limit exceeded. Try again in %s seconds", this.numOfSecondsForRetry);
+    }
 }
