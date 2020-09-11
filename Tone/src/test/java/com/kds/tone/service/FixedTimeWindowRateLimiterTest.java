@@ -24,9 +24,9 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RateLimiterServiceTest {
+public class FixedTimeWindowRateLimiterTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RateLimiterServiceTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FixedTimeWindowRateLimiterTest.class);
     private FixedTimeWindowRateLimiter rateLimiter;
 
     @BeforeEach
