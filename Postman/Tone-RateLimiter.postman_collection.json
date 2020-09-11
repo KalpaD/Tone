@@ -1,0 +1,35 @@
+{
+	"info": {
+		"_postman_id": "b2fa8c01-614b-464a-8cf6-ba1009d85e5a",
+		"name": "Tone:RateLimiter",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET /allowed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "userId",
+						"value": "\"1234\"",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/allowed",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"allowed"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -1,0 +1,13 @@
+---
+
+spring:
+  profiles: prod
+fixed.window.rate.limit.max.requests: 100
+fixed.window.rate.limit.time.window.in.seconds: 3600
+
+---
+
+spring:
+  profiles: integration_test
+fixed.window.rate.limit.max.requests: 3
+fixed.window.rate.limit.time.window.in.seconds: 4
