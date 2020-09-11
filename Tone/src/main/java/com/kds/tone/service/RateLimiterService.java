@@ -1,5 +1,6 @@
 package com.kds.tone.service;
 
+import com.kds.tone.model.RateLimitResults;
 import com.kds.tone.model.RequestCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +27,12 @@ public class RateLimiterService {
         this.rateLimiterLock = new ReentrantLock();
     }
 
-    public boolean isAllowed(final String userId) {
+    public RateLimitResults isAllowed(final String userId) {
         rateLimiterLock.lock();
         RequestCounter requestCounter = userToRequestCounterMap.get(userId);
         if (Objects.isNull(requestCounter)) {
             resetRequestCounter(userId);
-            return true;
+            return createResults(true, 0);
         }
         else {
             return handleExistingRequestCounter(userId, requestCounter);
@@ -41,28 +42,39 @@ public class RateLimiterService {
     private void resetRequestCounter(final String userId) {
         RequestCounter newRequestCounter = new RequestCounter(1, System.currentTimeMillis());
         userToRequestCounterMap.put(userId, newRequestCounter);
-        rateLimiterLock.unlock();
     }
 
-    private boolean handleExistingRequestCounter(final String userId, final RequestCounter requestCounter) {
+    private RateLimitResults createResults(boolean allowed, long numberSecondsSinceFirstRequest) {
+        long numOfSecondsUntilWindowReset = timeWindowInSeconds - numberSecondsSinceFirstRequest;
+        rateLimiterLock.unlock();
+        return new RateLimitResults(allowed, numOfSecondsUntilWindowReset);
+    }
+
+    private RateLimitResults handleExistingRequestCounter(final String userId, final RequestCounter requestCounter) {
         long numberSecondsSinceFirstRequest = calculateElapsedSecondsSinceFirstRequest(requestCounter);
         if (numberSecondsSinceFirstRequest >= timeWindowInSeconds) {
-            // reset the counter for this user
-            userToRequestCounterMap.remove(userId);
-            resetRequestCounter(userId);
-            return true;
+           return handleRequestOutsideTheTimeWindow(userId, numberSecondsSinceFirstRequest);
         }
         else {
-            int currentNumOfRequests = requestCounter.getCounter();
-            if (currentNumOfRequests < maxRequests) {
-                incrementAndSetCounter(currentNumOfRequests, requestCounter);
-                rateLimiterLock.unlock();
-                return true;
-            }
-            else {
-                rateLimiterLock.unlock();
-                return false;
-            }
+           return handleRequestInsideTheTimeWindow(requestCounter, numberSecondsSinceFirstRequest);
+        }
+    }
+
+    private RateLimitResults handleRequestOutsideTheTimeWindow(final String userId, final long numberSecondsSinceFirstRequest) {
+        // reset the counter for this user
+        userToRequestCounterMap.remove(userId);
+        resetRequestCounter(userId);
+        return createResults(true, numberSecondsSinceFirstRequest);
+    }
+
+    private RateLimitResults handleRequestInsideTheTimeWindow(final RequestCounter requestCounter, final long numberSecondsSinceFirstRequest) {
+        int currentNumOfRequests = requestCounter.getCounter();
+        if (currentNumOfRequests < maxRequests) {
+            incrementAndSetCounter(currentNumOfRequests, requestCounter);
+            return createResults(true, numberSecondsSinceFirstRequest);
+        }
+        else {
+            return createResults(false, numberSecondsSinceFirstRequest);
         }
     }
 
