@@ -11,6 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * This class provides the implementation of the fixed time window based rate limiting functionality.
+ * The max number of requests and the tine window can be configured at the initiation time of the rate limiter.
+ */
 @Component
 public class FixedTimeWindowRateLimiter implements RateLimiter {
 
@@ -43,7 +47,7 @@ public class FixedTimeWindowRateLimiter implements RateLimiter {
         userToRequestCounterMap.put(userId, newRequestCounter);
     }
 
-    private RateLimitResults createResults(boolean allowed, long numberSecondsSinceFirstRequest) {
+    private RateLimitResults createResults(final boolean allowed, final long numberSecondsSinceFirstRequest) {
         long numOfSecondsUntilWindowReset = timeWindowInSeconds - numberSecondsSinceFirstRequest;
         rateLimiterLock.unlock();
         return new RateLimitResults(allowed, numOfSecondsUntilWindowReset);

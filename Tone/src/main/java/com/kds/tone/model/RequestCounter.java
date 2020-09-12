@@ -42,10 +42,8 @@ public class RequestCounter {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("RequestCounter{");
-        sb.append("counter=").append(counter);
-        sb.append(", timestamp=").append(timestamp);
-        sb.append('}');
-        return sb.toString();
+        return "RequestCounter{" + "counter=" + counter +
+                ", timestamp=" + timestamp +
+                '}';
     }
 }
