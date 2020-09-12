@@ -1,5 +1,6 @@
 package com.kds.tone.controller;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,7 +23,8 @@ public class RateLimitControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    public void allow_should_respond_with_200_ok_when_number_of_requests_are_lt_max_allowed() throws Exception {
+    @DisplayName("/allowed api should respond with 200OK when number requests are less than the max allowed within the time window.")
+    public void allowed_should_respond_with_200_ok_when_number_of_requests_are_lt_max_allowed() throws Exception {
         MvcResult result =
                 mockMvc.perform(MockMvcRequestBuilders
                         .get("/allowed")
@@ -36,7 +38,8 @@ public class RateLimitControllerIntegrationTest {
     }
 
     @Test
-    public void allow_should_respond_with_429_too_many_requests_when_number_of_requests_are_gt_max_allowed_within_time_window() throws Exception {
+    @DisplayName("/allowed api should respond with 429TooManyRequests when number of requests exceeds the max allowed within the time window.")
+    public void allowed_should_respond_with_429_too_many_requests_when_number_of_requests_are_gt_max_allowed_within_time_window() throws Exception {
 
         for (int i = 0; i < 3; i++) {
 
