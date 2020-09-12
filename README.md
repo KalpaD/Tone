@@ -1,14 +1,39 @@
 # Tone : An in memeory rate limiter service.
 
+## Tone
 This project offers RESTFul API to use as a rate limiting module for other APIs.
 
-## Getting Started
+## Build status
+[![Build Status](https://travis-ci.com/KalpaD/Tone.svg?token=epdmqZYDyYw7eEghbUEq&branch=master)](https://travis-ci.com/KalpaD/Tone)
 
-### Prerequisites
+
+## Tech/framework used
 * Git
-* Java version "11.0.4" or above.
+* Java version "11.0.4"
 * Gradle 5.6.1 or above.
+* SpringBoot
 * Postman
+
+## Features
+
+1. Current implementation contains only fixed time window based rate limiting implemetation. The time window and the maximum number of requests can be connfigured using the application.yml file using the following properties.
+
+```
+    fixed.window.rate.limit.max.requests: 100
+    fixed.window.rate.limit.time.window.in.seconds: 3600
+```
+The default configuration allow 100 requests per userId for an hour.
+
+2. When a request get rejected the API responds with a JSON body as follows with a message mentioning the time for the retry.
+
+```
+    {
+        "allowed": false,
+        "message": "Rate limit exceeded. Try again in 2 seconds"
+    }
+```
+
+## Getting Started
 
 ### Clone
 To get started you can simply clone this repository using git:
@@ -22,8 +47,6 @@ cd Tone
 Step 1: Navigate to following directory and start the server via boot run task.
 
 ``` 
-cd /Tone
-// then run bootRun
 gradle bootRun
 ``` 
 
@@ -35,6 +58,6 @@ Step 3: You can use this collection to invoke the /allowd endpoint which does of
 
 Step 4: Please note that the postman collection expect you to run the server on port 8080 on localhost.  
 
-
-
+## License
+Apache License Version 2.0
 
