@@ -18,7 +18,7 @@ This project offers RESTFul API to use as a rate limiting module for other APIs.
 
 1. Current implementation contains only fixed time window based rate limiting implemetation. The time window and the maximum number of requests can be connfigured using the application.yml file using the following properties.
 
-```
+```yml
     fixed.window.rate.limit.max.requests: 100
     fixed.window.rate.limit.time.window.in.seconds: 3600
 ```
@@ -26,7 +26,7 @@ The default configuration allow 100 requests per userId for an hour.
 
 2. When a request get rejected the API responds with a JSON body as follows with a message mentioning the time for the retry.
 
-```
+```json
     {
         "allowed": false,
         "message": "Rate limit exceeded. Try again in 2 seconds"
